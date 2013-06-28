@@ -67,7 +67,7 @@ function validateNode(nodedata) {
 }
 
 (function() {
-  var couchurl = 'http://api.openwifimap.net/';
+  var couchurl = 'http://mapapi.weimarnetz.de/';
 
   //////////////////////////////////////////////////////////
   // map page
