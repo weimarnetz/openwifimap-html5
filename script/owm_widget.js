@@ -76,7 +76,7 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
 
   widget.control_scale = L.control.scale({imperial: false, maxWidth: 150, position: 'bottomright'})
     .addTo(widget.map);
-  widget.map.attributionControl.addAttribution('Nodes+Links &copy; <a href="http://openwifimap.net">OpenWiFiMap</a> contributors under <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL</a>');
+  widget.map.attributionControl.addAttribution('Nodes+Links &copy; <a href="http://tmap.weimarnetz.de">OpenWiFiMap</a> contributors under <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL</a>');
 
   widget.map.on('moveend', function() {
       var b = widget.map.getBounds(),
