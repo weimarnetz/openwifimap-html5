@@ -8,12 +8,37 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
   var mapoptions = L.extend({
     worldCopyJump: true
   }, mapoptions);
+  function getColor(val, bad, good) {
+    var colors = ['#D50000', '#D5A200', '#CCD500', '#00D500'];
+    var index = Math.floor( colors.length * (val - bad)/(good - bad) );
+    index = Math.max(0, Math.min(colors.length-1, index));
+    return colors[index];
+  }
   var couchmapoptions = L.extend({
     nodesUrl: 'view_nodes',
     nodesUrlSpatial: 'view_nodes_spatial',
     nodesUrlCoarse: 'view_nodes_coarse',
     nodeAdd: function(nodedata, layer) {
-      return L.marker(nodedata.latlng, 
+      var mtime = new Date(nodedata.mtime);
+      var time = new Date();
+      var timediff = time-mtime;
+      if (timediff<0) {
+        timediff=0;
+      }
+      timediff /= 1000*60*60*24;
+      var color = getColor(timediff, 4, 0);
+
+      /* unfortunately, this does not work because markercluster
+       * seems to need a marker (and not a circleMarker)
+      return L.circleMarker(nodedata.latlng,
+        {
+          title: nodedata.hostname,
+          radius: 15,
+          color: color
+        })
+      .bindPopup(options.getPopupHTML(nodedata)).addTo(layer);
+      */
+      return L.marker(nodedata.latlng,
         {
           title: nodedata.hostname,
           icon: L.icon( {iconUrl: 'images/node_circle.svg', iconSize: [30,30], iconAnchor: [15,15]})
@@ -35,22 +60,61 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
         return;
       }
 
-      return L.polyline([node1.data.latlng, node2.data.latlng], 
-          {color: '#85e805'})
-        .bindPopup(
-            'distance '
+      var quality1 = -1;
+      var quality2 = -1;
+      // find qualities and pick best (does this make sense?)
+      if (node1.data.links) {
+        for (var i=0, link; link=node1.data.links[i++];) {
+          if (link.id == node2.data.id && link.quality) {
+            quality1 = link.quality;
+          }
+        }
+      }
+      if (node2.data.links) {
+        for (var i=0, link; link=node2.data.links[i++];) {
+          if (link.id == node1.data.id && link.quality) {
+            quality2 = link.quality;
+          }
+        }
+      }
+      // check out of bounds
+      function validate_quality(q) {
+        return Math.min(1, Math.max(0, q));
+      }
+      var quality = validate_quality( Math.max(quality1, quality2) );
+
+      var color = getColor(quality, 0, 1)
+      var opacity = 0.25 + 0.5*quality;
+
+      var html = '<h3>'
             + node1.data.hostname
             + ' ↔ '
             + node2.data.hostname
-            + ': <br>'
+            + '</h3>'
+            + '<strong>Distance:</strong> '
             + distance
-            + ' meters'
-        ).addTo(layer);
+            + 'm';
+      if (quality1 > -1) {
+        quality1 = validate_quality(quality1);
+        html += '<br><strong>Quality</strong> (as reported by '
+          + node1.data.hostname+'): '
+          + quality1;
+      }
+      if (quality2 > -1) {
+        quality2 = validate_quality(quality2);
+        html += '<br><strong>Quality</strong> (as reported by '
+          + node2.data.hostname+'): '
+          + quality2;
+      }
+
+      return L.polyline([node1.data.latlng, node2.data.latlng],
+          {color: color, opacity: opacity})
+        .bindPopup(html).addTo(layer);
     }
   }, couchmapoptions);
-  
+
   widget.map = L.map(options['divId'], mapoptions);
-  
+
   var tile_cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
       key: 'e4e152a60cc5414eb81532de3d676261',
       styleId: 997,
@@ -58,10 +122,10 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
       }).addTo( widget.map );
   // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
   var tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
-  
+
   var couchmap = new L.CouchMap(couchmapoptions);
   var couchlayers = couchmap.getLayers();
-  
+
   widget.map.addLayer(couchlayers['nodes']).addLayer(couchlayers['links']);
   widget.control_layers = L.control.layers(
       {
