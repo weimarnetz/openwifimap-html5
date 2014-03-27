@@ -120,6 +120,9 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
       styleId: 997,
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>'
       }).addTo( widget.map );
+  var mapboxLayer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/andibraeu.hhoehc1c/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+  });
   // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
   var tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
 
@@ -130,6 +133,7 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
   widget.control_layers = L.control.layers(
       {
         "Cloudmade OSM": tile_cloudmade,
+        "Mapbox": mapboxLayer,
         "Bing satellite": tile_bing
       },
       {
