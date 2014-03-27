@@ -119,10 +119,10 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
       key: 'e4e152a60cc5414eb81532de3d676261',
       styleId: 997,
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>'
-      }).addTo( widget.map );
+      });
   var mapboxLayer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/andibraeu.hhoehc1c/{z}/{x}/{y}.png', {
     attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-  });
+  }).addTo( widget.map );
   // https://raw.github.com/shramov/leaflet-plugins/master/layer/tile/Bing.js
   var tile_bing = new L.BingLayer("ArewtcSllazYp52r7tojb64N94l-OrYWuS1GjUGeTavPmJP_jde3PIdpuYm24VpR");
 
@@ -144,7 +144,7 @@ var OWMWidget = function (options, mapoptions, couchmapoptions) {
 
   widget.control_scale = L.control.scale({imperial: false, maxWidth: 150, position: 'bottomright'})
     .addTo(widget.map);
-  widget.map.attributionControl.addAttribution('Nodes+Links &copy; <a href="http://tmap.weimarnetz.de">OpenWiFiMap</a> contributors under <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL</a>');
+  widget.map.attributionControl.addAttribution('Nodes+Links &copy; <a href="http://www.weimarnetz.de">OpenWiFiMap</a> contributors under <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL</a>');
 
   widget.map.on('moveend', function() {
       var b = widget.map.getBounds(),
