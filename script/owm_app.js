@@ -67,7 +67,7 @@ function validateNode(nodedata) {
 }
 
 (function() {
-  var couchurl = 'http://mapapi.weimarnetz.de/';
+  var couchurl = 'https://mapapi.weimarnetz.de/';
 
   //////////////////////////////////////////////////////////
   // map page
